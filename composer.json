@@ -1,0 +1,17 @@
+{
+    "name": "phpdie/quicklogin",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Phpdie\\Quicklogin\\":"src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "cheng",
+            "email": "phpdie@admin.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
