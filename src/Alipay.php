@@ -46,9 +46,7 @@ class Alipay extends AbstractOauth
     {
         unset($param['sign']);
         ksort($param);
-        foreach ($param as $k => &$v) {
-            $v = urlencode(mb_convert_encoding($v, "utf-8"));
-        }
+        array_map('urlencode',$param);
         $res = "-----BEGIN RSA PRIVATE KEY-----\n" .
             wordwrap($this->appSecret, 64, "\n", true) .
             "\n-----END RSA PRIVATE KEY-----";
@@ -72,6 +70,9 @@ class Alipay extends AbstractOauth
         $param['sign_type'] = 'RSA2';
         $param['timestamp'] = date('Y-m-d H:i:s');
         $param['version'] = '1.0';
+
+        var_dump('待签字符串',http_build_query($param));
+
         $param['sign'] = $this->signData($param);
         return $param;
     }
