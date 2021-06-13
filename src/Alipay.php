@@ -26,8 +26,10 @@ class Alipay extends AbstractOauth
     {
         $param = $this->buildRequestParam('alipay.system.oauth.token', '', '', $code);
         $result = Curl::post('https://openapi.alipay.com/gateway.do', $param);
+
+        print_r($result);
+
         $result = json_decode($result, true);
-        var_dump($result);
         if (!empty($result['alipay_system_oauth_token_response']['access_token'])) {
             return $result['alipay_system_oauth_token_response']['access_token'];
         }
@@ -37,13 +39,9 @@ class Alipay extends AbstractOauth
     {
         $param = $this->buildRequestParam('alipay.user.info.share', '', '', $auth_token);
         $result = Curl::post('https://openapi.alipay.com/gateway.do', $param);
-        
-        
-        echo 'getUserInfo' . PHP_EOL;
-       if($result){
-           var_dump(json_decode($result, true));
-       }
-        
+
+        print_r($result);
+
         return $result ? json_decode($result, true) : [];
     }
 
