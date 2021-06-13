@@ -24,13 +24,7 @@ class Alipay extends AbstractOauth
 
     public function getAccessToken($code, $refresh_token = '')
     {
-        if ($refresh_token) {
-            $param['refresh_token'] = $refresh_token;
-            $param['grant_type'] = 'refresh_token';
-        } else {
-            $param['code'] = $code;
-            $param['grant_type'] = 'authorization_code';
-        }
+        $param = $this->buildRequestParam('alipay.system.oauth.token', $code, '', '');
         $result = Curl::post('https://openapi.alipay.com/gateway.do', $param);
         $result = json_decode($result, true);
         if (!empty($result['alipay_system_oauth_token_response']['access_token'])) {
@@ -38,10 +32,41 @@ class Alipay extends AbstractOauth
         }
     }
 
-    public function  getUserInfo($token)
+    public function  getUserInfo($auth_token)
     {
-        $param['auth_token'] = $token;
+        $param = $this->buildRequestParam('alipay.user.info.share', '', '', $auth_token);
         $result = Curl::post('https://openapi.alipay.com/gateway.do', $param);
         return $result ? json_decode($result, true) : [];
+    }
+
+    private function signData($param)
+    {
+        unset($param['sign']);
+        $param = array_filter($param);
+        ksort($params);
+        return http_build_query($param);
+    }
+
+    //$code, $refresh_token, $auth_token三者只需要传一种,其他2种留空即可
+    private function buildRequestParam($method, $code, $refresh_token, $auth_token)
+    {
+        if ($code) {
+            $param['code'] = $code;
+            $param['grant_type'] = 'authorization_code';
+        } else if ($refresh_token) {
+            $param['refresh_token'] = $refresh_token;
+            $param['grant_type'] = 'refresh_token';
+        } else if ($auth_token) {
+            $param['code'] = $code;
+            $param['grant_type'] = 'authorization_code';
+        }
+        $param['method'] = $method;
+        $param['charset'] = 'utf-8';
+        $param['timestamp'] = date('Y-m-d H:i:s');
+        $param['version'] = '1.0';
+        $param['sign'] = 'RSA2';
+        $param['app_id'] = $this->appID;
+        $param['sign'] = $this->signData($param);
+        return $param;
     }
 }
