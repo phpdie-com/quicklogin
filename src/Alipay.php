@@ -48,7 +48,12 @@ class Alipay extends AbstractOauth
         unset($param['sign']);
         $param = array_filter($param);
         ksort($param);
-        return http_build_query($param);
+        $priKey = $this->appSecret;
+        $res = "-----BEGIN RSA PRIVATE KEY-----\n" .
+            wordwrap($priKey, 64, "\n", true) .
+            "\n-----END RSA PRIVATE KEY-----";
+        openssl_sign(http_build_query($param), $sign, $res, OPENSSL_ALGO_SHA256);
+        return base64_encode($sign);
     }
 
     //$code, $refresh_token, $auth_token三者只需要传一种,其他2种留空即可
