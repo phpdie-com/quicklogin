@@ -16,7 +16,7 @@ class Alipay extends AbstractOauth
     {
         $param['app_id'] = $this->appID;
         $param['redirect_uri'] = $this->redirectUri;
-        $param['scope'] = 'auth_user'; //获取用户信息场景暂支持 auth_user 和 auth_base 两个值
+        $param['scope'] = 'auth_base'; //获取用户信息场景暂支持 auth_user 和 auth_base 两个值
         $param['state'] = rand(1, 999); //不是必须的
         $uri = $this->loginUri . '?' . http_build_query($param);
         header('Location:' . $uri);
