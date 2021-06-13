@@ -55,8 +55,8 @@ class Alipay extends AbstractOauth
             wordwrap($priKey, 64, "\n", true) .
             "\n-----END RSA PRIVATE KEY-----";
         openssl_sign(http_build_query($param), $sign, $res, OPENSSL_ALGO_SHA256);
-        var_dump($sign);
-        var_dump(base64_encode($sign));
+        var_dump('openssl_sign', $sign);
+        var_dump('base64_encode', base64_encode($sign));
         return base64_encode($sign);
     }
 
