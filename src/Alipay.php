@@ -24,7 +24,7 @@ class Alipay extends AbstractOauth
     public function getAccessToken($code, $refresh_token = '')
     {
         $param = $this->buildRequestParam('alipay.system.oauth.token', $code);
-        $result = Curl::post('https://openapi.alipay.com/gateway.do?' . http_build_query($param));
+        $result = Curl::get('https://openapi.alipay.com/gateway.do?' . http_build_query($param));
 
         var_dump($result);
 
@@ -74,15 +74,9 @@ class Alipay extends AbstractOauth
         $param['timestamp'] = date('Y-m-d H:i:s');
         $param['version'] = '1.0';
 
-        var_dump('待签字符串', http_build_query($param));
+        var_dump('待签字符串', urldecode(http_build_query($param)));
 
         $param['sign'] = $this->signData($param);
-
-        foreach ($param as $k => &$v) {
-            if ($k != 'timestamp') {
-                $v = urlencode($v);
-            }
-        }
         return $param;
     }
 }
