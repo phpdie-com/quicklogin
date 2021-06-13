@@ -55,8 +55,6 @@ class Alipay extends AbstractOauth
             wordwrap($priKey, 64, "\n", true) .
             "\n-----END RSA PRIVATE KEY-----";
         openssl_sign(http_build_query($param), $sign, $res, OPENSSL_ALGO_SHA256);
-        var_dump('openssl_sign',htmlspecialchars($sign));
-        var_dump('base64_encode',htmlspecialchars(base64_encode($sign)));
         return base64_encode($sign);
     }
 
@@ -70,7 +68,7 @@ class Alipay extends AbstractOauth
             $param['refresh_token'] = $refresh_token;
             $param['grant_type'] = 'refresh_token';
         } else if ($auth_token) {
-            $param['code'] = $code;
+            $param['code'] = $auth_token;
             $param['grant_type'] = 'authorization_code';
         }
         $param['method'] = $method;
