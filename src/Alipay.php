@@ -46,22 +46,12 @@ class Alipay extends AbstractOauth
     {
         unset($param['sign']);
         ksort($param);
-        $stringToBeSigned = "";
-        $i = 0;
-        foreach ($param as $k => $v) {
-            if ($i == 0) {
-                $stringToBeSigned .= "$k" . "=" . urlencode($v);
-            } else {
-                $stringToBeSigned .= "&" . "$k" . "=" . urlencode($v);
-            }
-            $i++;
-        }
         $private_key = "-----BEGIN RSA PRIVATE KEY-----" . PHP_EOL .
             wordwrap($this->appSecret, 64, "\n", true) . PHP_EOL .
             "-----END RSA PRIVATE KEY-----";
         $res = openssl_get_privatekey($private_key);
         if ($res) {
-            openssl_sign($stringToBeSigned, $sign, $res, OPENSSL_ALGO_SHA256);
+            openssl_sign(http_build_query($param), $sign, $res, OPENSSL_ALGO_SHA256);
         } else {
             exit("私钥格式有误");
         }
@@ -90,6 +80,6 @@ class Alipay extends AbstractOauth
 
         var_dump('签名后的sign', $param['sign']);
 
-        return array_map('urlencode',$param);
+        return array_map('urlencode', $param);
     }
 }
