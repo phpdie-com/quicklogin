@@ -27,7 +27,6 @@ class Alipay extends AbstractOauth
         $param = $this->buildRequestParam('alipay.system.oauth.token', $code, '', '');
         $result = Curl::post('https://openapi.alipay.com/gateway.do', $param);
         var_dump('请求参数'.http_build_query($param));
-        var_dump('签名内容'.$this->signData($param));
         echo 'getAccessToken' . PHP_EOL;
         var_dump($result);
         $result = json_decode($result, true);
@@ -50,7 +49,12 @@ class Alipay extends AbstractOauth
         unset($param['sign']);
         $param = array_filter($param);
         ksort($param);
+        array_map('urlencode',$param);
         $priKey = $this->appSecret;
+
+        var_dump('待签名内容'.http_build_query($param));
+
+
         $res = "-----BEGIN RSA PRIVATE KEY-----\n" .
             wordwrap($priKey, 64, "\n", true) .
             "\n-----END RSA PRIVATE KEY-----";
@@ -72,7 +76,7 @@ class Alipay extends AbstractOauth
             $param['grant_type'] = 'authorization_code';
         }
         $param['method'] = $method;
-        $param['charset'] = 'GBK';
+        $param['charset'] = 'UTF-8';
         $param['timestamp'] = date('Y-m-d H:i:s');
         $param['version'] = '1.0';
         $param['sign_type'] = 'RSA2';
