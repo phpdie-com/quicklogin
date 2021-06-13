@@ -26,6 +26,7 @@ class Alipay extends AbstractOauth
     {
         $param = $this->buildRequestParam('alipay.system.oauth.token', $code, '', '');
         $result = Curl::post('https://openapi.alipay.com/gateway.do', $param);
+        var_dump(http_build_query($param));
         echo 'getAccessToken' . PHP_EOL;
         var_dump($result);
         $result = json_decode($result, true);
