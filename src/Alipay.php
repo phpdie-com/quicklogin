@@ -53,7 +53,9 @@ class Alipay extends AbstractOauth
         unset($param['sign']);
         $param = array_filter($param);
         ksort($param);
-        array_map('urlencode', $param);
+        foreach($param as $k=>&$v){
+            $v=urlencode(mb_convert_encoding($v, "UTF-8"));
+        }
         $priKey = $this->appSecret;
         $res = "-----BEGIN RSA PRIVATE KEY-----\n" .
             wordwrap($priKey, 64, "\n", true) .
