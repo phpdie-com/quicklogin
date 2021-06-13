@@ -71,7 +71,7 @@ class Alipay extends AbstractOauth
         $param['method'] = $method;
         $param['charset'] = 'utf-8';
         $param['sign_type'] = 'RSA2';
-        $param['timestamp'] = date('Y-M-d H:i:s');
+        $param['timestamp'] = date('Y-m-d H:i:s');
         $param['version'] = '1.0';
 
         var_dump('待签字符串', http_build_query($param));
