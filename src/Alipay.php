@@ -23,14 +23,10 @@ class Alipay extends AbstractOauth
 
     public function getAccessToken($code, $refresh_token = '')
     {
-        $param = $this->buildRequestParam('alipay.system.oauth.token', '', '', $code);
-
-        var_dump('请求参数数组',$param);
-        var_dump('请求参数字符串',http_build_query($param));
-
+        $param = $this->buildRequestParam('alipay.system.oauth.token', false, false, $code);
         $result = Curl::post('https://openapi.alipay.com/gateway.do', $param);
 
-        var_dump('请求getAccessToken接口结果',$result);
+        var_dump('请求getAccessToken接口结果', $result);
 
         $result = json_decode($result, true);
         if (!empty($result['alipay_system_oauth_token_response']['access_token'])) {
@@ -40,11 +36,8 @@ class Alipay extends AbstractOauth
 
     public function  getUserInfo($auth_token)
     {
-        $param = $this->buildRequestParam('alipay.user.info.share', '', '', $auth_token);
+        $param = $this->buildRequestParam('alipay.user.info.share', false, false, $auth_token);
         $result = Curl::post('https://openapi.alipay.com/gateway.do', $param);
-
-        var_dump($result);
-
         return $result ? json_decode($result, true) : [];
     }
 
@@ -52,21 +45,18 @@ class Alipay extends AbstractOauth
     {
         unset($param['sign']);
         ksort($param);
-        foreach($param as $k=>&$v){
-            $v=urlencode(mb_convert_encoding($v, "UTF-8"));
+        foreach ($param as $k => &$v) {
+            $v = urlencode(mb_convert_encoding($v, "utf-8"));
         }
         $res = "-----BEGIN RSA PRIVATE KEY-----\n" .
             wordwrap($this->appSecret, 64, "\n", true) .
             "\n-----END RSA PRIVATE KEY-----";
-            
-        var_dump($v);
-        var_dump($res);
 
         openssl_sign(http_build_query($param), $sign, $res, OPENSSL_ALGO_SHA256);
         return base64_encode($sign);
     }
 
-    //$code, $refresh_token, $auth_token三者只需要传一种,其他2种留空即可
+    //$code, $refresh_token, $auth_token三者只需要传一种,其他2种留false即可
     private function buildRequestParam($method, $code, $refresh_token, $auth_token)
     {
         if ($code) {
@@ -80,15 +70,16 @@ class Alipay extends AbstractOauth
             $param['grant_type'] = 'authorization_code';
         }
         $param['method'] = $method;
-        $param['charset'] = 'UTF-8';
+        $param['charset'] = 'utf-8';
         $param['timestamp'] = date('Y-m-d H:i:s');
         $param['version'] = '1.0';
         $param['sign_type'] = 'RSA2';
         $param['app_id'] = $this->appID;
-        $param['sign'] = $this->signData($param);
+        $param_copy=$param;
+        $signStr = $this->signData($param_copy);
+        $param['sign'] = $signStr;
 
-        var_dump('签名字符串',$param['sign']);
-
+        var_dump('签名字符串'.$signStr);
         return $param;
     }
 }
