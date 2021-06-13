@@ -90,6 +90,6 @@ class Alipay extends AbstractOauth
 
         var_dump('签名后的sign', $param['sign']);
 
-        return $param;
+        return array_map('urlencode',$param);
     }
 }
