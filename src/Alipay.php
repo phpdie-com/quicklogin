@@ -43,7 +43,7 @@ class Alipay extends AbstractOauth
     {
         unset($param['sign']);
         $param = array_filter($param);
-        ksort($params);
+        ksort($param);
         return http_build_query($param);
     }
 
