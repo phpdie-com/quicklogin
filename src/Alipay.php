@@ -36,17 +36,21 @@ class Alipay extends AbstractOauth
     {
         $param = $this->buildRequestParam('alipay.user.info.share', $auth_token);
         $result = Curl::post('https://openapi.alipay.com/gateway.do', $param);
+        var_dump($result);
         return $result ? json_decode($result, true) : [];
     }
 
-    private function buildRequestParam($method, $code, $refresh_token = '')
+    private function buildRequestParam($method, $code, $auth_token = '', $refresh_token = '')
     {
-        if ($refresh_token) {
-            $param['refresh_token'] = $refresh_token;
-            $param['grant_type'] = 'refresh_token';
-        } else {
+        if ($code) {
             $param['code'] = $code;
             $param['grant_type'] = 'authorization_code';
+        } else if ($auth_token) {
+            $param['auth_token'] = $auth_token;
+            $param['biz_content'] = '';
+        } else if ($refresh_token) {
+            $param['refresh_token'] = $refresh_token;
+            $param['grant_type'] = 'refresh_token';
         }
         $param['app_id'] = $this->appID;
         $param['method'] = $method;
@@ -80,14 +84,13 @@ class Alipay extends AbstractOauth
 
     private function sign($param)
     {
-        unset($param['sign']);
-        // $data = $this->getSignContent($param);
+        $data = $this->getSignContent($param);
         $priKey = $this->appSecret;
         $res = "-----BEGIN RSA PRIVATE KEY-----\n" .
             wordwrap($priKey, 64, "\n", true) .
             "\n-----END RSA PRIVATE KEY-----";
         ($res) or die('您使用的私钥格式错误，请检查RSA私钥配置');
-        openssl_sign(http_build_query($param), $sign, $res, OPENSSL_ALGO_SHA256);
+        openssl_sign($data, $sign, $res, OPENSSL_ALGO_SHA256);
         $sign = base64_encode($sign);
         return $sign;
     }
