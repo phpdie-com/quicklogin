@@ -53,15 +53,10 @@ class Alipay extends AbstractOauth
         $param['method'] = $method;
         $param['charset'] = 'utf-8';
         $param['sign_type'] = 'RSA2';
-        $param['timestamp'] = date('Y-m-d H:i:s');
+        $param['timestamp'] =urlencode(date('Y-m-d H:i:s'));
         $param['version'] = '1.0';
-        $param['sign'] = $this->sign($param);
-        return array_map(function ($item) {
-            if (strcasecmp($item, 'utf-8') != 0) {
-                $data = mb_convert_encoding($item, 'utf-8');
-            }
-            return urlencode($item);
-        }, $param);
+        $param['sign'] = urlencode($this->sign($param));
+        return $param;
     }
 
     private function getSignContent($params)
