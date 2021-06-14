@@ -7,9 +7,6 @@ use Phpdie\Quicklogin\Curl;
 
 class Alipay extends AbstractOauth
 {
-    private $fileCharset = 'utf-8';
-    private $targetCharset = 'utf-8';
-    private $postCharset = 'utf-8';
     public function __construct($appID, $appSecret, $redirectUri)
     {
         parent::__construct($appID, $appSecret, $redirectUri, 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm');
@@ -38,12 +35,11 @@ class Alipay extends AbstractOauth
     public function  getUserInfo($accessToken)
     {
         $param = $this->buildRequestParam('alipay.user.info.share', '', $accessToken);
-
-        $headers = array('content-type: application/x-www-form-urlencoded;charset=' . $this->postCharset);
-
+        $headers = array('content-type: application/x-www-form-urlencoded;charset=utf-8');
         $result = Curl::post('https://openapi.alipay.com/gateway.do', $param, false, $headers);
+
         var_dump($result);
-        
+
         $result = json_decode($result, true);
         if (!empty($result['alipay_user_info_share_response'])) {
             return $result['alipay_user_info_share_response'];
@@ -69,18 +65,13 @@ class Alipay extends AbstractOauth
         $param['timestamp'] = date('Y-m-d H:i:s');
         $param['version'] = '1.0';
         $param['sign'] = $this->sign($param);
-
         $param = $this->formatData($param);
         return $param;
     }
 
     private function formatData($param)
     {
-        //return mb_convert_encoding($param, 'UTF-8');
-        foreach ($param  as $key => &$value) {
-            $value = $value = $this->characet($value, 'utf-8');
-        }
-        return $param;
+        return mb_convert_encoding($param, 'utf-8', 'auto');
     }
 
     private function getSignContent($params)
@@ -91,7 +82,7 @@ class Alipay extends AbstractOauth
         $i = 0;
         foreach ($params as $k => $v) {
             if ("@" != substr($v, 0, 1)) {
-                $v = $this->characet($v, $this->postCharset);
+                $v = mb_convert_encoding($v, 'utf-8', 'auto');
                 if ($i == 0) {
                     $stringToBeSigned .= "$k" . "=" . "$v";
                 } else {
@@ -115,16 +106,5 @@ class Alipay extends AbstractOauth
         openssl_sign($data, $sign, $res, OPENSSL_ALGO_SHA256);
         $sign = base64_encode($sign);
         return $sign;
-    }
-
-    private function characet($data, $targetCharset)
-    {
-        if (!empty($data)) {
-            $fileType = $this->fileCharset;
-            if (strcasecmp($fileType, $targetCharset) != 0) {
-                $data = mb_convert_encoding($data, $targetCharset, $fileType);
-            }
-        }
-        return $data;
     }
 }
