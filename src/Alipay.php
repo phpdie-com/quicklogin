@@ -66,7 +66,7 @@ class Alipay extends AbstractOauth
         }
         $param['app_id'] = $this->appID;
         $param['method'] = $method;
-        $param['charset'] = 'utf-8';
+        $param['charset'] = 'gb2312';
         $param['sign_type'] = 'RSA2';
         $param['timestamp'] = date('Y-m-d H:i:s');
         $param['version'] = '1.0';
