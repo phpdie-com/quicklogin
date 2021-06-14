@@ -34,6 +34,7 @@ class Alipay extends AbstractOauth
     public function  getUserInfo($accessToken)
     {
         $param = $this->buildRequestParam('alipay.user.info.share', '', $accessToken);
+        //这里用get请求不需要花太多精力处理乱码问题
         $result = Curl::get('https://openapi.alipay.com/gateway.do', $param);
         $result = json_decode($result, true);
         if (!empty($result['alipay_user_info_share_response'])) {
@@ -48,7 +49,7 @@ class Alipay extends AbstractOauth
             $param['grant_type'] = 'authorization_code';
         } else if ($auth_token) {
             $param['auth_token'] = $auth_token;
-            $param['biz_content'] = '{"aa":"bb"}'; //说明上讲这个是必填项,随意搞个json
+            $param['biz_content'] = '{}'; //说明上讲这个是必填项,随意搞个json
         } else if ($refresh_token) {
             $param['refresh_token'] = $refresh_token;
             $param['grant_type'] = 'refresh_token';
