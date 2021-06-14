@@ -26,7 +26,6 @@ class Alipay extends AbstractOauth
     {
         $param = $this->buildRequestParam('alipay.system.oauth.token', $code);
         $result = Curl::post('https://openapi.alipay.com/gateway.do', $param);
-        var_dump($result);
         $result = json_decode($result, true);
         if (!empty($result['alipay_system_oauth_token_response']['access_token'])) {
             return $result['alipay_system_oauth_token_response']['access_token'];
@@ -53,9 +52,9 @@ class Alipay extends AbstractOauth
         $param['method'] = $method;
         $param['charset'] = 'utf-8';
         $param['sign_type'] = 'RSA2';
-        $param['timestamp'] =urlencode(date('Y-m-d H:i:s'));
+        $param['timestamp'] = date('Y-m-d H:i:s');
         $param['version'] = '1.0';
-        $param['sign'] = urlencode($this->sign($param));
+        $param['sign'] = $this->sign($param);
         return $param;
     }
 
@@ -81,13 +80,14 @@ class Alipay extends AbstractOauth
 
     private function sign($param)
     {
-        $data = $this->getSignContent($param);
+        unset($param['sign']);
+        // $data = $this->getSignContent($param);
         $priKey = $this->appSecret;
         $res = "-----BEGIN RSA PRIVATE KEY-----\n" .
             wordwrap($priKey, 64, "\n", true) .
             "\n-----END RSA PRIVATE KEY-----";
         ($res) or die('您使用的私钥格式错误，请检查RSA私钥配置');
-        openssl_sign($data, $sign, $res, OPENSSL_ALGO_SHA256);
+        openssl_sign(http_build_query($param), $sign, $res, OPENSSL_ALGO_SHA256);
         $sign = base64_encode($sign);
         return $sign;
     }
