@@ -16,7 +16,7 @@ class Alipay extends AbstractOauth
     {
         $param['app_id'] = $this->appID;
         $param['redirect_uri'] = $this->redirectUri;
-        $param['scope'] = 'auth_user,auth_base'; //获取用户信息场景暂支持 auth_user 和 auth_base 两个值
+        $param['scope'] = 'auth_user'; //获取用户信息场景暂支持 auth_user 和 auth_base 两个值
         $uri = $this->loginUri . '?' . http_build_query($param);
         header('Location:' . $uri);
     }
@@ -29,17 +29,19 @@ class Alipay extends AbstractOauth
         if (!empty($result['alipay_system_oauth_token_response']['access_token'])) {
             return $result['alipay_system_oauth_token_response']['access_token'];
         }
+        return '';
     }
 
     public function  getUserInfo($accessToken)
     {
         $param = $this->buildRequestParam('alipay.user.info.share', '', $accessToken);
-        //这里用get请求不需要花太多精力处理乱码问题
+        //这里用get请求不需要花太多精力处理乱码问题,用post返回的数据中文乱码
         $result = Curl::get('https://openapi.alipay.com/gateway.do', $param);
         $result = json_decode($result, true);
         if (!empty($result['alipay_user_info_share_response'])) {
             return $result['alipay_user_info_share_response'];
         }
+        return [];
     }
 
     private function buildRequestParam($method, $code, $auth_token = '', $refresh_token = '')
@@ -60,7 +62,7 @@ class Alipay extends AbstractOauth
         $param['sign_type'] = 'RSA2';
         $param['timestamp'] = date('Y-m-d H:i:s');
         $param['version'] = '1.0';
-        $param['sign'] = $this->sign($param);
+        $param['sign'] = $this->sign($param); //并没有urlencode也成功了
         return $param;
     }
 
@@ -80,7 +82,6 @@ class Alipay extends AbstractOauth
                 $i++;
             }
         }
-        unset($k, $v);
         return $stringToBeSigned;
     }
 
