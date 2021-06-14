@@ -16,7 +16,7 @@ class Alipay extends AbstractOauth
     {
         $param['app_id'] = $this->appID;
         $param['redirect_uri'] = $this->redirectUri;
-        $param['scope'] = 'auth_user'; //获取用户信息场景暂支持 auth_user 和 auth_base 两个值
+        $param['scope'] = 'auth_user,auth_base'; //获取用户信息场景暂支持 auth_user 和 auth_base 两个值
         $uri = $this->loginUri . '?' . http_build_query($param);
         header('Location:' . $uri);
     }
@@ -61,14 +61,15 @@ class Alipay extends AbstractOauth
         $param['version'] = '1.0';
         $param['sign'] = $this->sign($param);
 
-        $param=$this->formatData($param);
+        $param = $this->formatData($param);
         return $param;
     }
 
-    private function formatData($param){
-        return mb_convert_encoding($param,'UTF-8');
-        foreach($param  as $key=>&$value){
-            $value=mb_convert_encoding($value,'UTF-8');
+    private function formatData($param)
+    {
+        //return mb_convert_encoding($param, 'UTF-8');
+        foreach ($param  as $key => &$value) {
+            $value = mb_convert_encoding($value, 'UTF-8');
         }
         return $param;
     }
