@@ -7,6 +7,9 @@ use Phpdie\Quicklogin\Curl;
 
 class Alipay extends AbstractOauth
 {
+    private $fileCharset = 'utf-8';
+    private $targetCharset = 'utf-8';
+    private $postCharset = 'utf-8';
     public function __construct($appID, $appSecret, $redirectUri)
     {
         parent::__construct($appID, $appSecret, $redirectUri, 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm');
@@ -34,7 +37,10 @@ class Alipay extends AbstractOauth
     public function  getUserInfo($accessToken)
     {
         $param = $this->buildRequestParam('alipay.user.info.share', '', $accessToken);
-        $result = Curl::post('https://openapi.alipay.com/gateway.do', $param);
+
+        $headers = array('content-type: application/x-www-form-urlencoded;charset=' . $this->postCharset);
+
+        $result = Curl::post('https://openapi.alipay.com/gateway.do', $param, false, $headers);
         $result = json_decode($result, true);
         if (!empty($result['alipay_user_info_share_response'])) {
             return $result['alipay_user_info_share_response'];
@@ -69,7 +75,7 @@ class Alipay extends AbstractOauth
     {
         //return mb_convert_encoding($param, 'UTF-8');
         foreach ($param  as $key => &$value) {
-            $value = mb_convert_encoding($value, 'UTF-8');
+            $value = $value = $this->characet($value, 'utf-8');
         }
         return $param;
     }
@@ -82,6 +88,7 @@ class Alipay extends AbstractOauth
         $i = 0;
         foreach ($params as $k => $v) {
             if ("@" != substr($v, 0, 1)) {
+                $v = $this->characet($v, $this->postCharset);
                 if ($i == 0) {
                     $stringToBeSigned .= "$k" . "=" . "$v";
                 } else {
@@ -105,5 +112,16 @@ class Alipay extends AbstractOauth
         openssl_sign($data, $sign, $res, OPENSSL_ALGO_SHA256);
         $sign = base64_encode($sign);
         return $sign;
+    }
+
+    private function characet($data, $targetCharset)
+    {
+        if (!empty($data)) {
+            $fileType = $this->fileCharset;
+            if (strcasecmp($fileType, $targetCharset) != 0) {
+                $data = mb_convert_encoding($data, $targetCharset, $fileType);
+            }
+        }
+        return $data;
     }
 }
