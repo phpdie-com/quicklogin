@@ -16,7 +16,6 @@ class Alipay extends AbstractOauth
     {
         $param['app_id'] = $this->appID;
         $param['redirect_uri'] = $this->redirectUri;
-        $param['charset'] = 'utf-8';
         $param['scope'] = 'auth_user,auth_base'; //获取用户信息场景暂支持 auth_user 和 auth_base 两个值
         $uri = $this->loginUri . '?' . http_build_query($param);
         header('Location:' . $uri);
@@ -35,11 +34,7 @@ class Alipay extends AbstractOauth
     public function  getUserInfo($accessToken)
     {
         $param = $this->buildRequestParam('alipay.user.info.share', '', $accessToken);
-        $headers = array('content-type: application/x-www-form-urlencoded;charset=utf-8');
-        $result = Curl::post('https://openapi.alipay.com/gateway.do', $param, false, $headers);
-
-        var_dump($result);
-
+        $result = Curl::get('https://openapi.alipay.com/gateway.do', $param);
         $result = json_decode($result, true);
         if (!empty($result['alipay_user_info_share_response'])) {
             return $result['alipay_user_info_share_response'];
@@ -65,13 +60,7 @@ class Alipay extends AbstractOauth
         $param['timestamp'] = date('Y-m-d H:i:s');
         $param['version'] = '1.0';
         $param['sign'] = $this->sign($param);
-        $param = $this->formatData($param);
         return $param;
-    }
-
-    private function formatData($param)
-    {
-        return mb_convert_encoding($param, 'utf-8', 'auto');
     }
 
     private function getSignContent($params)
@@ -82,7 +71,6 @@ class Alipay extends AbstractOauth
         $i = 0;
         foreach ($params as $k => $v) {
             if ("@" != substr($v, 0, 1)) {
-                $v = mb_convert_encoding($v, 'utf-8', 'auto');
                 if ($i == 0) {
                     $stringToBeSigned .= "$k" . "=" . "$v";
                 } else {
