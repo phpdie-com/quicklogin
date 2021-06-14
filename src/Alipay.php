@@ -35,8 +35,10 @@ class Alipay extends AbstractOauth
     {
         $param = $this->buildRequestParam('alipay.user.info.share', '', $accessToken);
         $result = Curl::post('https://openapi.alipay.com/gateway.do', $param);
-        var_dump($result);
-        return $result ? json_decode($result, true) : [];
+        $result = json_decode($result, true);
+        if (!empty($result['alipay_user_info_share_response'])) {
+            return $result['alipay_user_info_share_response'];
+        }
     }
 
     private function buildRequestParam($method, $code, $auth_token = '', $refresh_token = '')
@@ -46,7 +48,7 @@ class Alipay extends AbstractOauth
             $param['grant_type'] = 'authorization_code';
         } else if ($auth_token) {
             $param['auth_token'] = $auth_token;
-            $param['biz_content'] = '';
+            $param['biz_content'] = '{"aa":"bb"}'; //说明上讲这个是必填项,随意搞个json
         } else if ($refresh_token) {
             $param['refresh_token'] = $refresh_token;
             $param['grant_type'] = 'refresh_token';
@@ -58,6 +60,16 @@ class Alipay extends AbstractOauth
         $param['timestamp'] = date('Y-m-d H:i:s');
         $param['version'] = '1.0';
         $param['sign'] = $this->sign($param);
+
+        $param=$this->formatData($param);
+        return $param;
+    }
+
+    private function formatData($param){
+        return mb_convert_encoding($param,'UTF-8');
+        foreach($param  as $key=>&$value){
+            $value=mb_convert_encoding($value,'UTF-8');
+        }
         return $param;
     }
 
