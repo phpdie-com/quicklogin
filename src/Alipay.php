@@ -19,6 +19,7 @@ class Alipay extends AbstractOauth
     {
         $param['app_id'] = $this->appID;
         $param['redirect_uri'] = $this->redirectUri;
+        $param['charset'] = 'utf-8';
         $param['scope'] = 'auth_user,auth_base'; //获取用户信息场景暂支持 auth_user 和 auth_base 两个值
         $uri = $this->loginUri . '?' . http_build_query($param);
         header('Location:' . $uri);
@@ -41,6 +42,8 @@ class Alipay extends AbstractOauth
         $headers = array('content-type: application/x-www-form-urlencoded;charset=' . $this->postCharset);
 
         $result = Curl::post('https://openapi.alipay.com/gateway.do', $param, false, $headers);
+        var_dump($result);
+        
         $result = json_decode($result, true);
         if (!empty($result['alipay_user_info_share_response'])) {
             return $result['alipay_user_info_share_response'];
