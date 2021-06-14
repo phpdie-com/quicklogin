@@ -25,7 +25,8 @@ class Alipay extends AbstractOauth
     public function getAccessToken($code, $refresh_token = '')
     {
         $param = $this->buildRequestParam('alipay.system.oauth.token', $code);
-        $result = Curl::post('https://openapi.alipay.com/gateway.do', $param, false);
+        $result = Curl::post('https://openapi.alipay.com/gateway.do', $param);
+        var_dump($result);
         $result = json_decode($result, true);
         if (!empty($result['alipay_system_oauth_token_response']['access_token'])) {
             return $result['alipay_system_oauth_token_response']['access_token'];
@@ -55,7 +56,12 @@ class Alipay extends AbstractOauth
         $param['timestamp'] = date('Y-m-d H:i:s');
         $param['version'] = '1.0';
         $param['sign'] = $this->sign($param);
-        return array_map('urlencode', $param);
+        return array_map(function ($item) {
+            if (strcasecmp($item, 'utf-8') != 0) {
+                $data = mb_convert_encoding($item, 'utf-8');
+            }
+            return urlencode($item);
+        }, $param);
     }
 
     private function getSignContent($params)
