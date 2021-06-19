@@ -42,9 +42,9 @@ class Github extends AbstractOauth
 
     public function  getUserInfo($token)
     {
-        $header['Authorization'] ='token '.$token;
-        $header['Accept'] = 'application/json';
-        $header['User-Agent'] = 'Windows';
+        $header[] = 'Authorization:token ' . $token;
+        $header[] = 'Accept:application/json';
+        $header[] = 'User-Agent:Windows';
         $result = Curl::get('https://api.github.com/user', [], false, $header);
         $result = parse_str($result, $temp);
         $result = $result ? $result : $temp;
