@@ -36,6 +36,7 @@ class Alipay extends AbstractOauth
     {
         $param = $this->buildRequestParam('alipay.user.info.share', '', $accessToken);
         //这里用get请求不需要花太多精力处理乱码问题,用post返回的数据中文乱码
+        //可以考虑用echo mb_convert_encoding($result, 'UTF-8', 'UTF-8,GBK,GB2312,BIG5');解决中文乱码的问题
         $result = Curl::get('https://openapi.alipay.com/gateway.do', $param);
         $result = json_decode($result, true);
         if (!empty($result['alipay_user_info_share_response'])) {
