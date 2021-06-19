@@ -20,7 +20,7 @@ class Weixin extends AbstractOauth
         ksort($param);
         $uri = $this->loginUri . '?' . http_build_query($param) . '#wechat_redirect';
         header('User-Agent:micromessage');
-        header('Location:' . $uri);
+        // header('Location:' . $uri);
     }
 
     public function getAccessToken($authorization_code, $refresh_token = '')
