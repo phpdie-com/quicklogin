@@ -16,7 +16,7 @@ class Weixin extends AbstractOauth
         $param['appid'] = $this->appID;
         $param['redirect_uri'] = $this->redirectUri;
         $param['response_type'] = 'code';
-        $param['scope'] = 'snsapi_base';
+        $param['scope'] = 'snsapi_userinfo';
         ksort($param);
         $uri = $this->loginUri . '?' . http_build_query($param) . '#wechat_redirect';
         header('Location:' . $uri);
