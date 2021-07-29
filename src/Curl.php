@@ -11,7 +11,7 @@ class Curl
         self::$curl = curl_init();
     }
 
-    public static function get($url, $data = array(), $ssl = false, $headers = array(), $agent = '')
+    public static function get($url, $data = array(), $ssl = false, $headers = array())
     {
         self::init();
         if (count($data) && strpos($url, '?') === false) {
@@ -26,9 +26,6 @@ class Curl
         if ($headers) {
             curl_setopt(self::$curl, CURLOPT_HTTPHEADER, $headers);
         }
-        if ($agent) {
-            curl_setopt(self::$curl, CURLOPT_USERAGENT, $agent);
-        }
         curl_setopt(self::$curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt(self::$curl, CURLOPT_FOLLOWLOCATION, true); //解决301重定向获取不到
         curl_setopt(self::$curl, CURLOPT_URL, $url);
@@ -38,7 +35,7 @@ class Curl
         return $response;
     }
 
-    public static function post($url, $data = array(), $ssl = false, $headers = array(), $agent = '')
+    public static function post($url, $data = array(), $ssl = false, $headers = array())
     {
         self::init();
         if ($ssl) {
@@ -48,9 +45,6 @@ class Curl
         }
         if ($headers) {
             curl_setopt(self::$curl, CURLOPT_HTTPHEADER, $headers);
-        }
-        if ($agent) {
-            curl_setopt(self::$curl, CURLOPT_USERAGENT, $agent);
         }
         curl_setopt(self::$curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt(self::$curl, CURLOPT_POST, true);

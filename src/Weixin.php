@@ -19,8 +19,7 @@ class Weixin extends AbstractOauth
         $param['scope'] = 'snsapi_userinfo';
         ksort($param);
         $uri = $this->loginUri . '?' . http_build_query($param) . '#wechat_redirect';
-        //header('Location:' . $uri);
-        echo Curl::get($uri, [], false, [], 'micromessenger');
+        header('Location:' . $uri);
     }
 
     public function getAccessToken($authorization_code, $refresh_token = '')
